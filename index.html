@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신권 안전 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-stone-200 z-10 flex-none">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl">👷</span>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">신권 안전 가이드</h1>
+                    <p class="text-xs text-slate-500">DC-82 & S-283 기반 표준</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-4 text-sm font-medium text-slate-600">
+                <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span>목표: 무사고 (Zero Accident)</span>
+                </div>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-2xl p-2">☰</button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden max-w-7xl mx-auto w-full">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="bg-stone-50 w-64 border-r border-stone-200 flex-none hidden md:flex flex-col overflow-y-auto transform transition-transform duration-300 z-20 absolute md:relative h-full">
+            <div class="p-4 space-y-2">
+                <button onclick="navigate('dashboard')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 bg-white shadow-sm border border-stone-200 text-blue-600 font-bold hover:bg-stone-100 transition-colors">
+                    <span>📊</span> 대시보드
+                </button>
+                <button onclick="navigate('basic-safety')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-slate-900 transition-colors">
+                    <span>🛡️</span> 기본 안전 표준
+                </button>
+                <button onclick="navigate('high-risk')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-slate-900 transition-colors">
+                    <span>⚠️</span> 고위험 작업
+                </button>
+                <button onclick="navigate('maintenance')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-slate-900 transition-colors">
+                    <span>🏢</span> 시설 유지보수
+                </button>
+                <button onclick="navigate('overseer')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-slate-900 transition-colors">
+                    <span>📋</span> 감독자 도구
+                </button>
+                <!-- AI Assistant Button -->
+                <button onclick="navigate('ai-assistant')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-purple-600 transition-colors border border-transparent hover:border-purple-200">
+                    <span>💬</span> AI 안전 비서
+                </button>
+                <!-- Quiz Button -->
+                <button onclick="navigate('quiz-section')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-600 hover:bg-white hover:shadow-sm hover:text-emerald-600 transition-colors border border-transparent hover:border-emerald-200 mt-4 border-t border-stone-200">
+                    <span>📝</span> 안전 지식 퀴즈
+                </button>
+            </div>
+            <div class="mt-auto p-4">
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-xs text-blue-800">
+                    <p class="font-bold mb-1">💡 오늘의 원칙</p>
+                    <p>"실용적인 지혜와 사고력을 잘 지켜라." (잠언 3:21)</p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
+            
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section fade-in space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">안전하게 함께 일함</h2>
+                    <p class="text-slate-600 mb-4">
+                        여호와 하느님께서는 생명을 신성하게 여기십니다. 우리의 목표는 모든 신권 건축 공사와 유지보수 작업에서 **무사고**를 달성하는 것입니다.
+                    </p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                        <!-- Chart: Safety Culture -->
+                        <div class="bg-stone-50 rounded-lg p-4">
+                            <h3 class="font-bold text-slate-700 mb-4 text-center">안전 사고 예방의 핵심 요소</h3>
+                            <div class="chart-container">
+                                <canvas id="safetyCultureChart"></canvas>
+                            </div>
+                            <p class="text-xs text-center text-slate-500 mt-2">안전 의식, 훈련, 계획, 장비의 조화가 필요합니다.</p>
+                        </div>
+                        
+                        <!-- Hierarchy of Controls Interactive -->
+                        <div>
+                            <h3 class="font-bold text-slate-700 mb-4 flex justify-between items-center">
+                                <span>위험성 감소 대책 (Hierarchy of Controls)</span>
+                                <span class="text-xs font-normal bg-stone-200 px-2 py-1 rounded">클릭하여 자세히 보기</span>
+                            </h3>
+                            <div class="flex flex-col items-center w-full max-w-md mx-auto space-y-1" id="risk-pyramid">
+                                <!-- Generated by JS -->
+                            </div>
+                            <div id="risk-detail" class="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-900 hidden">
+                                <span class="font-bold block mb-1" id="risk-detail-title"></span>
+                                <span id="risk-detail-desc"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow cursor-pointer" onclick="navigate('basic-safety')">
+                        <div class="text-3xl mb-2">⛑️</div>
+                        <h3 class="font-bold text-lg mb-1">기본 안전 표준</h3>
+                        <p class="text-sm text-slate-500">PPE, 현장 관리, 개인 건강 등 모든 자원봉사자를 위한 필수 수칙입니다.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow cursor-pointer" onclick="navigate('high-risk')">
+                        <div class="text-3xl mb-2">⚡</div>
+                        <h3 class="font-bold text-lg mb-1">고위험 작업</h3>
+                        <p class="text-sm text-slate-500">전기, 고소 작업, 중장비 등 승인이 필요한 전문 작업 안전 수칙입니다.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow cursor-pointer" onclick="navigate('quiz-section')">
+                        <div class="text-3xl mb-2">📝</div>
+                        <h3 class="font-bold text-lg mb-1">안전 지식 퀴즈</h3>
+                        <p class="text-sm text-slate-500">20문제로 구성된 퀴즈를 통해 안전 지식을 점검해 보세요.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Basic Safety Standards -->
+            <section id="basic-safety" class="view-section hidden fade-in space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h2 class="text-2xl font-bold mb-4">기본 건강 및 안전 표준</h2>
+                    <p class="mb-6 text-slate-600">
+                        모든 자원봉사자는 현장에 들어오기 전 기본 표준을 숙지해야 합니다. 
+                        자신의 건강을 살피고, 적절한 복장을 갖추며, 안전한 습관을 유지하십시오.
+                    </p>
+
+                    <!-- Interactive PPE Selector -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <div class="bg-stone-100 rounded-xl p-6 flex flex-col items-center justify-center space-y-4">
+                            <h3 class="font-bold text-lg text-slate-700">개인용 보호 장비 (PPE)</h3>
+                            <div class="relative h-64 w-40 bg-stone-300 rounded-full flex flex-col items-center justify-between py-4 shadow-inner">
+                                <button onclick="showPPE('head')" class="w-10 h-10 bg-yellow-400 rounded-full shadow-md hover:scale-110 transition-transform flex items-center justify-center text-xl z-10">⛑️</button>
+                                <div class="flex w-full justify-between px-2">
+                                    <button onclick="showPPE('eye')" class="w-8 h-8 bg-blue-300 rounded-full shadow-md hover:scale-110 transition-transform flex items-center justify-center text-sm z-10">👓</button>
+                                    <button onclick="showPPE('ear')" class="w-8 h-8 bg-orange-300 rounded-full shadow-md hover:scale-110 transition-transform flex items-center justify-center text-sm z-10">🎧</button>
+                                </div>
+                                <button onclick="showPPE('hand')" class="w-8 h-8 bg-green-300 rounded-full shadow-md hover:scale-110 transition-transform flex items-center justify-center text-sm z-10 relative top-2">🧤</button>
+                                <button onclick="showPPE('foot')" class="w-10 h-10 bg-slate-700 rounded-lg shadow-md hover:scale-110 transition-transform flex items-center justify-center text-xl z-10 text-white">🥾</button>
+                            </div>
+                            <p class="text-xs text-slate-500">아이콘을 클릭하여 세부사항 확인</p>
+                        </div>
+                        <div class="lg:col-span-2 bg-white rounded-xl border border-stone-200 p-6 flex flex-col justify-center">
+                            <div id="ppe-content">
+                                <h4 class="text-xl font-bold text-slate-800 mb-2">보호 장비 선택</h4>
+                                <p class="text-slate-600">왼쪽의 인체 모형에서 부위를 선택하여 DC-82 표준에 따른 보호 장비 착용법을 확인하십시오.</p>
+                                <ul class="mt-4 space-y-2 list-disc list-inside text-slate-600">
+                                    <li>장비는 항상 상태가 좋고 잘 맞아야 합니다.</li>
+                                    <li>작업 위험 분석에 명시된 장비를 착용하십시오.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General Rules Accordion -->
+                    <div class="space-y-3">
+                        <details class="group bg-white rounded-lg border border-stone-200">
+                            <summary class="flex justify-between items-center p-4 cursor-pointer font-bold text-slate-700 hover:bg-stone-50">
+                                <span>🧼 개인 건강과 위생</span>
+                                <span class="group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div class="p-4 border-t border-stone-100 text-sm text-slate-600 space-y-2 bg-stone-50">
+                                <p>• 아프다면 집에 머무르십시오.</p>
+                                <p>• 20초 이상 비누와 물로 손을 씻으십시오.</p>
+                                <p>• 기침이나 재채기는 팔꿈치 안쪽에 하십시오.</p>
+                                <p>• 피로하거나 졸린 상태에서는 운전하거나 작업하지 마십시오.</p>
+                            </div>
+                        </details>
+                        <details class="group bg-white rounded-lg border border-stone-200">
+                            <summary class="flex justify-between items-center p-4 cursor-pointer font-bold text-slate-700 hover:bg-stone-50">
+                                <span>👕 복장 및 외모</span>
+                                <span class="group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div class="p-4 border-t border-stone-100 text-sm text-slate-600 space-y-2 bg-stone-50">
+                                <p>• 긴바지, 소매가 있는 셔츠를 착용하십시오.</p>
+                                <p>• 헐렁하거나 끈이 달린 옷, 장신구(반지, 목걸이 등)는 착용 금지입니다.</p>
+                                <p>• 긴 머리는 뒤로 묶어야 합니다.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- High Risk Section -->
+            <section id="high-risk" class="view-section hidden fade-in space-y-6">
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🛑</span>
+                        <div>
+                            <h3 class="font-bold text-amber-800">주의: 승인된 작업자 전용</h3>
+                            <p class="text-sm text-amber-700 mt-1">고위험 작업은 감독자의 승인을 받고 적절한 훈련을 받은 만 18세 이상의 작업자만 수행할 수 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Working at Heights -->
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                        <div class="bg-blue-600 px-4 py-2 text-white font-bold flex justify-between items-center">
+                            <span>🏗️ 고소 작업 (1.8m 이상)</span>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <p class="text-sm text-slate-600">추락은 주요 부상 원인입니다. 1.8m 이상 높이에서는 반드시 추락 방지 조치가 필요합니다.</p>
+                            <!-- Ladder Calculator -->
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <h4 class="font-bold text-xs text-blue-800 uppercase mb-2">사다리 4:1 법칙 계산기</h4>
+                                <div class="flex gap-2 items-end">
+                                    <div class="flex-1">
+                                        <label class="text-xs text-slate-500">높이 (m)</label>
+                                        <input type="number" id="ladder-height" class="w-full border rounded p-1 text-sm" placeholder="예: 4">
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="text-xs text-slate-500">필요 하단 거리</label>
+                                        <div id="ladder-result" class="font-bold text-slate-800 text-sm py-1.5 px-2 bg-white rounded border">0 m</div>
+                                    </div>
+                                    <button onclick="calcLadder()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">계산</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Electrical Safety -->
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                        <div class="bg-amber-600 px-4 py-2 text-white font-bold"><span>🔌 전기 작업 및 LOTO</span></div>
+                        <div class="p-5 space-y-4 text-sm text-slate-600">
+                            <p>모든 전기 작업은 자격 있는 전문가가 수행해야 합니다. 통전 중인 장비 작업은 원칙적으로 금지됩니다.</p>
+                            <div class="bg-stone-100 p-3 rounded text-sm border-l-4 border-amber-500">
+                                <span class="font-bold block mb-1">조작 방지/조작 금지 (LOTO)</span>
+                                <ol class="list-decimal list-inside space-y-1 text-slate-600 text-xs">
+                                    <li>에너지원 식별 및 공지</li>
+                                    <li>전원 차단 및 잔류 에너지 방출</li>
+                                    <li>개인 잠금 장치 및 꼬리표 부착</li>
+                                    <li>제로 에너지 확인 (테스트)</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Maintenance Section -->
+            <section id="maintenance" class="view-section hidden fade-in space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">왕국회관 유지보수 및 인명 보호</h2>
+                    <p class="text-slate-600 mb-8">S-283 문서를 기반으로 한 시설 관리 지침입니다. 정기적인 유지보수는 사고를 예방하고 건물의 수명을 연장합니다.</p>
+                    
+                    <!-- Tabs for Maintenance -->
+                    <div class="flex border-b border-stone-200 mb-6 overflow-x-auto">
+                        <button onclick="switchMaintenanceTab('m-general')" class="m-tab px-6 py-3 font-bold text-blue-600 border-b-2 border-blue-600 transition-colors whitespace-nowrap">일반/야외</button>
+                        <button onclick="switchMaintenanceTab('m-cleaning')" class="m-tab px-6 py-3 font-medium text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap">청소/화학물질</button>
+                        <button onclick="switchMaintenanceTab('m-fire')" class="m-tab px-6 py-3 font-medium text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap">화재/전기</button>
+                    </div>
+
+                    <!-- General/Outdoor Tab Content -->
+                    <div id="m-general" class="m-tab-content grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-purple-600">👣</span> 낙상 위험 방지
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>계단이나 고르지 않은 표면은 눈에 띄게 표시</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>미끄러운 곳은 미끄럼 방지 처리</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>매트나 카펫이 평평한지 확인</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>손상된 표면(균열, 움푹 파인 곳) 즉시 보수</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-green-600">🌲</span> 야외 유지보수
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>장비(예초기 등)는 회중 소유 및 관리 권장</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>연료는 별도 안전한 장소 보관</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>매년 장비 안전 교육 실시</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span>전동 공구 사용 시 안전 거리 유지</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Cleaning Tab Content -->
+                    <div id="m-cleaning" class="m-tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-blue-600">🧪</span> 화학 물질 관리
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">• MSDS(물질안전보건자료) 비치 및 숙지</li>
+                                <li class="flex items-start gap-2">• 모든 용기에 라벨 부착 (원래 용기 사용 권장)</li>
+                                <li class="flex items-start gap-2">• 화학 물질 혼합 금지 (특히 표백제와 암모니아)</li>
+                                <li class="flex items-start gap-2">• 적절한 환기 시설 확보</li>
+                            </ul>
+                        </div>
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-yellow-600">🧹</span> 청소 안전
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">• 바닥 청소 시 '미끄럼 주의' 표지판 설치</li>
+                                <li class="flex items-start gap-2">• 혈액이나 체액 청소 시 적절한 PPE 착용</li>
+                                <li class="flex items-start gap-2">• 높은 곳 청소 시 안전한 사다리 사용</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Fire/Electrical Tab Content -->
+                    <div id="m-fire" class="m-tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-red-600">🔥</span> 화재 예방
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">• 비상구 및 탈출로 상시 확보</li>
+                                <li class="flex items-start gap-2">• 소화기 위치 표시 및 정기 점검</li>
+                                <li class="flex items-start gap-2">• 가연성 물질은 열원에서 멀리 보관</li>
+                            </ul>
+                        </div>
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span class="text-amber-600">⚡</span> 전기 안전
+                            </h4>
+                            <ul class="text-sm space-y-3 text-slate-600">
+                                <li class="flex items-start gap-2">• 손상된 코드나 플러그 사용 금지</li>
+                                <li class="flex items-start gap-2">• 문어발식 멀티탭 사용 지양</li>
+                                <li class="flex items-start gap-2">• 전기 패널 앞 공간 확보 (접근성 유지)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Overseer Tools -->
+            <section id="overseer" class="view-section hidden fade-in space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h2 class="text-2xl font-bold mb-4">감독자 도구 (Overseer's Toolkit)</h2>
+                    <p class="mb-6 text-slate-600">
+                        작업을 계획하고, 소통하며, 위험을 통제하십시오. 강력한 멀티모달 AI 기능으로 스마트하게 현장을 관리할 수 있습니다.
+                    </p>
+
+                    <!-- Feature 1: Image Hazard Analysis (Gemini Vision) -->
+                    <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">Gemini Vision AI ✨</div>
+                        <h3 class="font-bold text-lg mb-2 text-purple-900">📷 현장 위험 사진 분석</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <input type="file" id="hazard-image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-purple-700 hover:file:bg-purple-100 shadow-sm cursor-pointer">
+                                <img id="image-preview" class="hidden mt-4 max-w-full h-auto max-h-64 rounded-lg border-2 border-purple-200 shadow-md object-cover">
+                            </div>
+                            <button onclick="analyzeImageWithAI()" id="btn-analyze-img" class="hidden bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">사진 분석 시작 ✨</button>
+                            <div id="ai-vision-loading" class="hidden flex items-center gap-3 text-purple-600 text-sm font-bold p-4 bg-white rounded-lg shadow-sm border border-purple-100"><div class="spinner"></div> 이미지를 분석 중입니다...</div>
+                            <div id="ai-vision-output" class="hidden bg-white p-5 rounded-lg shadow-md border border-purple-200 text-sm space-y-4">
+                                <div><h4 class="font-bold text-red-600 mb-2">⚠️ 식별된 불안전 요소</h4><ul id="ai-vision-hazards" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
+                                <div><h4 class="font-bold text-blue-600 mb-2">🛡️ 개선 권고 사항</h4><ul id="ai-vision-recommendations" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: Smart Risk Assessment & Audio Briefing -->
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-bl-lg border-b border-l border-purple-200">Gemini AI Powered ✨</div>
+                        <h3 class="font-bold text-lg mb-4 text-slate-800">📝 스마트 위험성 평가 및 TBM 오디오 생성</h3>
+                        <div class="space-y-4">
+                            <textarea id="ai-risk-task" rows="3" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none shadow-inner" placeholder="작업 상세 설명 입력..."></textarea>
+                            <button onclick="analyzeRiskWithAI()" class="bg-slate-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-slate-900 transition-colors flex items-center gap-2 shadow-sm">텍스트 위험성 평가 ✨</button>
+                            <div id="ai-risk-loading" class="hidden flex items-center gap-3 text-purple-600 text-sm font-bold p-4 bg-purple-50 rounded-lg border border-purple-100"><div class="spinner"></div> 분석 중...</div>
+                            <div id="ai-risk-output" class="hidden bg-white p-5 rounded-lg border border-stone-200 text-sm shadow-sm space-y-4">
+                                <div><h4 class="font-bold text-red-600 mb-2">⚠️ 잠재적 위험 요소</h4><ul id="ai-risk-hazards" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
+                                <div><h4 class="font-bold text-blue-600 mb-2">🛡️ 권장 안전 대책</h4><ul id="ai-risk-controls" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
+                                <!-- TTS -->
+                                <div class="mt-6 pt-4 border-t border-stone-100 bg-purple-50 p-4 rounded-lg text-center">
+                                    <button id="btn-generate-audio" onclick="generateAudioBriefing()" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition-all shadow-md inline-flex items-center gap-2"><span>▶️</span> TBM 오디오 브리핑 생성</button>
+                                    <div id="audio-loading" class="hidden mt-3 text-purple-600 text-sm font-bold flex justify-center items-center gap-2"><div class="sound-wave"><span></span><span></span><span></span><span></span></div> 오디오 합성 중...</div>
+                                    <audio id="audio-player" controls class="hidden w-full mt-4 h-10 rounded-full shadow-sm"></audio>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: AI Near-miss/Accident Report Generator -->
+                    <div class="bg-red-50 p-6 rounded-xl border border-red-200 mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">Gemini AI ✨</div>
+                        <h3 class="font-bold text-lg mb-2 text-red-900">📝 AI 아차사고/사고 보고서 작성기</h3>
+                        <p class="text-sm text-red-700 mb-4">발생한 상황에 대한 몇 가지 키워드를 입력하면 S-283 지침에 부합하는 공식 보고서 초안을 작성합니다.</p>
+                        <div class="space-y-4">
+                            <input type="text" id="ai-report-keywords" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none shadow-inner" placeholder="예: 사다리 미끄러짐, 발목 접지름, 2층 복도">
+                            <button onclick="generateSafetyReport()" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm">보고서 초안 생성 ✨</button>
+                            <div id="ai-report-loading" class="hidden flex items-center gap-3 text-red-600 text-sm font-bold p-4 bg-white rounded-lg shadow-sm border border-red-100"><div class="spinner !border-l-red-600"></div> 보고서를 작성 중입니다...</div>
+                            <div id="ai-report-output" class="hidden bg-white p-5 rounded-lg shadow-md border border-red-200 text-sm whitespace-pre-wrap leading-relaxed text-slate-700">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4: External Contractor Contract Checklist (S-283) -->
+                    <div class="bg-slate-800 rounded-xl shadow-lg border border-slate-700 overflow-hidden mb-6">
+                        <div class="bg-[#1e293b] px-6 py-4 border-b border-slate-700">
+                            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                                외부 업체 계약 체크리스트 (S-283)
+                            </h3>
+                        </div>
+                        <div class="bg-white p-6 space-y-4">
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" id="check-1" class="w-5 h-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                <label for="check-1" class="text-slate-700 font-medium cursor-pointer">계약서 작성 (책임, 비용, 보험 명시)</label>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" id="check-2" class="w-5 h-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                <label for="check-2" class="text-slate-700 font-medium cursor-pointer">최소 3곳 견적 비교</label>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" id="check-3" class="w-5 h-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                <label for="check-3" class="text-slate-700 font-medium cursor-pointer">보험 증명서 확인 (추가 피보험자 등록)</label>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" id="check-4" class="w-5 h-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                <label for="check-4" class="text-slate-700 font-medium cursor-pointer">형제와의 계약도 문서화 필수</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Safety Assistant (Chat) -->
+            <section id="ai-assistant" class="view-section hidden fade-in space-y-6 h-full flex flex-col">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex-1 flex flex-col max-h-full">
+                    <div class="flex items-center gap-3 border-b border-stone-100 pb-4 mb-4">
+                        <span class="text-3xl">🤖✨</span>
+                        <div><h2 class="text-2xl font-bold text-slate-800">AI 안전 비서</h2></div>
+                    </div>
+                    <div id="chat-history" class="flex-1 overflow-y-auto space-y-4 mb-4 p-2">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-lg flex-shrink-0">✨</div>
+                            <div class="bg-stone-50 border border-stone-200 rounded-lg rounded-tl-none p-3 text-sm text-slate-700 max-w-[85%]">안녕하세요! 안전 관련 궁금한 점을 질문해 주세요.</div>
+                        </div>
+                    </div>
+                    <div class="relative mt-auto pt-2">
+                        <input type="text" id="chat-input" class="w-full border border-stone-300 rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="질문을 입력하세요..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                        <button onclick="sendChatMessage()" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700">↑</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Safety Quiz Section -->
+            <section id="quiz-section" class="view-section hidden fade-in space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 max-w-3xl mx-auto">
+                    
+                    <!-- Quiz Start Screen -->
+                    <div id="quiz-start" class="text-center py-10 fade-in">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">안전 지식 퀴즈 (20문항)</h2>
+                        <p class="text-slate-600 mb-8">DC-82 및 S-283 가이드라인을 바탕으로 한 안전 지식을 점검해 봅니다.<br>모든 자원봉사자의 안전을 위해 반드시 알아야 할 내용입니다.</p>
+                        <button onclick="startQuiz()" class="bg-emerald-600 text-white font-bold py-3 px-8 rounded-full hover:bg-emerald-700 transition-all shadow-md text-lg">
+                            퀴즈 시작하기
+                        </button>
+                    </div>
+
+                    <!-- Quiz Question Screen -->
+                    <div id="quiz-area" class="hidden fade-in">
+                        <div class="flex justify-between items-center mb-4 text-sm font-bold text-slate-500">
+                            <span id="quiz-progress-text">문제 1 / 20</span>
+                            <span id="quiz-score-text" class="text-emerald-600">점수: 0</span>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-stone-200 rounded-full h-2.5 mb-6">
+                            <div id="quiz-progress-bar" class="bg-emerald-600 h-2.5 rounded-full" style="width: 5%"></div>
+                        </div>
+
+                        <h3 id="quiz-question" class="text-xl font-bold text-slate-800 mb-6 leading-relaxed">질문이 여기에 표시됩니다.</h3>
+                        
+                        <div id="quiz-options" class="space-y-3">
+                            <!-- Buttons generated by JS -->
+                        </div>
+                        
+                        <!-- Explanation Box (Shows after answering) -->
+                        <div id="quiz-explanation-box" class="hidden mt-6 p-4 rounded-lg border text-sm">
+                            <p id="quiz-explanation-text" class="font-medium"></p>
+                            <button id="quiz-next-btn" onclick="nextQuestion()" class="mt-4 bg-slate-800 text-white px-6 py-2 rounded-lg hover:bg-slate-900 transition-colors">다음 문제</button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Result Screen -->
+                    <div id="quiz-result" class="hidden text-center py-8 fade-in">
+                        <div id="quiz-result-icon" class="text-6xl mb-4">🏆</div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">퀴즈 완료!</h2>
+                        <p class="text-xl text-slate-600 mb-2">최종 점수: <span id="quiz-final-score" class="font-bold text-emerald-600">0</span> / 100</p>
+                        <p id="quiz-result-msg" class="text-slate-500 mb-8">수고하셨습니다!</p>
+                        
+                        <div class="flex justify-center gap-4">
+                            <button onclick="startQuiz()" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition-all shadow-sm">
+                                다시 풀기
+                            </button>
+                            <button onclick="navigate('dashboard')" class="bg-stone-200 text-stone-700 font-bold py-2 px-6 rounded-lg hover:bg-stone-300 transition-all shadow-sm">
+                                대시보드로 가기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Custom Generator -->
+                    <div id="quiz-custom-gen" class="mt-10 pt-10 border-t border-stone-200 fade-in">
+                        <h3 class="font-bold text-lg text-slate-800 mb-2 flex items-center gap-2">
+                            <span>🎯</span> AI 맞춤형 퀴즈 생성기
+                        </h3>
+                        <p class="text-sm text-slate-500 mb-4">특정 주제를 입력하여 새로운 퀴즈 5문항을 즉석에서 생성합니다.</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="quiz-topic-input" class="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="예: 사다리, 전기 안전, 화학 물질...">
+                            <button onclick="generateCustomQuiz()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition-colors">생성 ✨</button>
+                        </div>
+                        <div id="quiz-gen-loading" class="hidden mt-4 flex items-center gap-2 text-emerald-600 text-sm font-bold"><div class="spinner"></div> 퀴즈를 생성하고 있습니다...</div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
