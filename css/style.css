@@ -132,3 +132,14 @@ body {
 .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* Fix mobile view clipping when added to home screen */
+main#main-content {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+    main#main-content {
+        padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+    }
+}
