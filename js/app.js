@@ -1,4 +1,8 @@
 import { quizData } from './quizData.js';
+import { registerSW } from 'virtual:pwa-register';
+
+// Register Service Worker for PWA
+registerSW({ immediate: true });
 
 window.navigate = navigate;
 window.switchMaintenanceTab = switchMaintenanceTab;
@@ -70,6 +74,10 @@ function navigate(sectionId, isBack = false) {
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.classList.remove('hidden');
+        // Trigger reflow for transition
+        void targetSection.offsetWidth;
+        targetSection.style.opacity = "1";
+        targetSection.style.transform = "translateY(0)";
     }
     
     document.querySelectorAll('#sidebar .nav-item').forEach(btn => {

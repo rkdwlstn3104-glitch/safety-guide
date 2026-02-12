@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#ffffff">
 </head>
 <body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-stone-200 z-10 flex-none">
+    <header class="bg-white shadow-sm border-b border-stone-200 z-10 flex-none safe-top">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <button id="back-btn" onclick="goBack()" class="hidden text-slate-600 hover:text-blue-600 transition-colors p-1" title="뒤로 가기">
@@ -44,7 +46,7 @@
         <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
 
         <!-- Sidebar Navigation -->
-        <nav id="sidebar" class="bg-stone-50 w-64 border-r border-stone-200 flex-none flex flex-col overflow-y-auto transform transition-all duration-300 z-30 absolute md:relative h-full -translate-x-full md:translate-x-0">
+        <nav id="sidebar" class="bg-stone-50 w-64 border-r border-stone-200 flex-none flex flex-col overflow-y-auto transform transition-all duration-300 z-30 absolute md:relative h-full -translate-x-full md:translate-x-0 safe-bottom">
             <div class="p-4 space-y-2">
                 <button onclick="navigate('dashboard')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 bg-white shadow-sm border border-stone-200 text-blue-600 font-bold hover:bg-stone-100 transition-colors">
                     <span>📊</span> 대시보드

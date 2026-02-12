@@ -63,6 +63,16 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.view-section {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.view-section.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
 /* AI Loading Spinner */
 .spinner {
     border: 3px solid rgba(0, 0, 0, 0.1);
@@ -113,4 +123,12 @@ body {
 #sidebar-overlay.active {
     display: block;
     opacity: 1;
+}
+
+/* iOS Safe Area Insets for Web App */
+.safe-top {
+    padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
 }
