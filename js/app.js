@@ -243,7 +243,7 @@ function showQuizResult() {
 
 
 // --- Gemini API Setup & AI Features ---
-const apiKey = "AIzaSyCHkLJcF15XfNsMjNGAuLV2eIDED_vZAqQ"; // 본인의 실제 API 키로 교체 필요
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_TEXT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
 const GEMINI_TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
 
@@ -271,7 +271,7 @@ async function generateSafetyReport() {
     전문적이고 격식 있는 한국어 문체로 작성해 주세요.`;
 
     try {
-        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. .env 파일에 VITE_GEMINI_API_KEY를 설정해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -366,7 +366,7 @@ async function generateCustomQuiz() {
     ]`;
 
     try {
-        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. .env 파일에 VITE_GEMINI_API_KEY를 설정해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -450,7 +450,7 @@ async function analyzeImageWithAI() {
     const prompt = "이 현장 사진에서 안전 위반 사항이나 위험 요소를 식별하고 권고 사항을 알려주세요. JSON 형식으로 'hazards'와 'recommendations' 배열을 응답하세요.";
 
     try {
-        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. .env 파일에 VITE_GEMINI_API_KEY를 설정해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -492,7 +492,7 @@ async function analyzeRiskWithAI() {
     const prompt = `작업: "${task}". 이 작업의 잠재적 위험 요소와 안전 대책을 한국어로 제안해 주세요. JSON 형식: { "hazards": [], "controls": [] }`;
 
     try {
-        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. .env 파일에 VITE_GEMINI_API_KEY를 설정해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -537,7 +537,7 @@ async function sendChatMessage() {
     const prompt = `당신은 '신권 안전 비서'입니다. DC-82 및 S-283 가이드라인을 바탕으로 다음 질문에 친절하고 전문적으로 답변해 주세요: ${msg}`;
 
     try {
-        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. .env 파일에 VITE_GEMINI_API_KEY를 설정해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
