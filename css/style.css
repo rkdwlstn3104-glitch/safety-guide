@@ -104,3 +104,13 @@ body {
 .quiz-option {
     transition: all 0.2s ease;
 }
+
+/* Sidebar Toggle Classes */
+#sidebar.active {
+    transform: translateX(0);
+}
+
+#sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}

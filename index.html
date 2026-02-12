@@ -6,18 +6,27 @@
     <title>신권 안전 가이드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 </head>
 <body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-stone-200 z-10 flex-none">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="text-3xl">👷</span>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-800">신권 안전 가이드</h1>
-                    <p class="text-xs text-slate-500">DC-82 & S-283 기반 표준</p>
+            <div class="flex items-center gap-3">
+                <button id="back-btn" onclick="goBack()" class="hidden text-slate-600 hover:text-blue-600 transition-colors p-1" title="뒤로 가기">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl">👷</span>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800">신권 안전 가이드</h1>
+                        <p class="text-xs text-slate-500">DC-82 & S-283 기반 표준</p>
+                    </div>
                 </div>
             </div>
             <div class="hidden md:flex items-center gap-4 text-sm font-medium text-slate-600">
@@ -26,13 +35,16 @@
                     <span>목표: 무사고 (Zero Accident)</span>
                 </div>
             </div>
-            <button id="mobile-menu-btn" class="md:hidden text-2xl p-2">☰</button>
+            <button id="mobile-menu-btn" class="text-2xl p-2 md:hidden">☰</button>
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden max-w-7xl mx-auto w-full">
+    <div class="flex flex-1 overflow-hidden max-w-7xl mx-auto w-full relative">
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+
         <!-- Sidebar Navigation -->
-        <nav id="sidebar" class="bg-stone-50 w-64 border-r border-stone-200 flex-none hidden md:flex flex-col overflow-y-auto transform transition-transform duration-300 z-20 absolute md:relative h-full">
+        <nav id="sidebar" class="bg-stone-50 w-64 border-r border-stone-200 flex-none flex flex-col overflow-y-auto transform transition-all duration-300 z-30 absolute md:relative h-full -translate-x-full md:translate-x-0">
             <div class="p-4 space-y-2">
                 <button onclick="navigate('dashboard')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 bg-white shadow-sm border border-stone-200 text-blue-600 font-bold hover:bg-stone-100 transition-colors">
                     <span>📊</span> 대시보드
@@ -324,7 +336,7 @@
                             </h4>
                             <ul class="text-sm space-y-3 text-slate-600">
                                 <li class="flex items-start gap-2">• 바닥 청소 시 '미끄럼 주의' 표지판 설치</li>
-                                <li class="flex items-start gap-2">• 혈액이나 체액 청소 시 적절한 PPE 착용</li>
+                                <li class="flex items-start gap-2">• 혈액이나 체액 청소 시 적절한 개인보호구 착용</li>
                                 <li class="flex items-start gap-2">• 높은 곳 청소 시 안전한 사다리 사용</li>
                             </ul>
                         </div>
@@ -368,10 +380,15 @@
                     <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-6 relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">Gemini Vision AI ✨</div>
                         <h3 class="font-bold text-lg mb-2 text-purple-900">📷 현장 위험 사진 분석</h3>
+                        <p class="text-sm text-purple-800 mb-4">작업 현장 사진을 업로드하면, AI가 불안전 요소(위험)를 시각적으로 찾아내고 개선 사항을 제안합니다.</p>
                         <div class="space-y-4">
-                            <div>
-                                <input type="file" id="hazard-image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-purple-700 hover:file:bg-purple-100 shadow-sm cursor-pointer">
-                                <img id="image-preview" class="hidden mt-4 max-w-full h-auto max-h-64 rounded-lg border-2 border-purple-200 shadow-md object-cover">
+                            <div class="flex flex-col gap-4 bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
+                                <label for="hazard-image" class="flex items-center justify-center gap-2 w-full py-4 px-4 bg-purple-50 text-purple-700 rounded-lg border-2 border-dashed border-purple-200 hover:bg-purple-100 cursor-pointer transition-colors font-bold">
+                                    <span class="text-xl">📷</span>
+                                    <span id="file-label-text">현장 사진 촬영 또는 선택</span>
+                                </label>
+                                <input type="file" id="hazard-image" accept="image/*" capture="environment" class="hidden">
+                                <img id="image-preview" class="hidden mt-2 max-w-full h-auto max-h-64 rounded-lg border-2 border-purple-200 shadow-md object-cover">
                             </div>
                             <button onclick="analyzeImageWithAI()" id="btn-analyze-img" class="hidden bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">사진 분석 시작 ✨</button>
                             <div id="ai-vision-loading" class="hidden flex items-center gap-3 text-purple-600 text-sm font-bold p-4 bg-white rounded-lg shadow-sm border border-purple-100"><div class="spinner"></div> 이미지를 분석 중입니다...</div>
@@ -385,34 +402,28 @@
                     <!-- Feature 2: Smart Risk Assessment & Audio Briefing -->
                     <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 mb-6 relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-bl-lg border-b border-l border-purple-200">Gemini AI Powered ✨</div>
-                        <h3 class="font-bold text-lg mb-4 text-slate-800">📝 스마트 위험성 평가 및 TBM 오디오 생성</h3>
+                        <h3 class="font-bold text-lg mb-4 text-slate-800">📝 스마트 위험성 평가</h3>
                         <div class="space-y-4">
-                            <textarea id="ai-risk-task" rows="3" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none shadow-inner" placeholder="작업 상세 설명 입력..."></textarea>
+                            <textarea id="ai-risk-task" rows="3" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none shadow-inner" placeholder="예: 비가 온 다음 날, 지상 3미터 높이의 외부 외벽의 페인트칠을 위해 A자형 사다리를 사용할 예정입니다."></textarea>
                             <button onclick="analyzeRiskWithAI()" class="bg-slate-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-slate-900 transition-colors flex items-center gap-2 shadow-sm">텍스트 위험성 평가 ✨</button>
                             <div id="ai-risk-loading" class="hidden flex items-center gap-3 text-purple-600 text-sm font-bold p-4 bg-purple-50 rounded-lg border border-purple-100"><div class="spinner"></div> 분석 중...</div>
                             <div id="ai-risk-output" class="hidden bg-white p-5 rounded-lg border border-stone-200 text-sm shadow-sm space-y-4">
                                 <div><h4 class="font-bold text-red-600 mb-2">⚠️ 잠재적 위험 요소</h4><ul id="ai-risk-hazards" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
                                 <div><h4 class="font-bold text-blue-600 mb-2">🛡️ 권장 안전 대책</h4><ul id="ai-risk-controls" class="list-disc list-inside space-y-1 text-slate-700"></ul></div>
-                                <!-- TTS -->
-                                <div class="mt-6 pt-4 border-t border-stone-100 bg-purple-50 p-4 rounded-lg text-center">
-                                    <button id="btn-generate-audio" onclick="generateAudioBriefing()" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition-all shadow-md inline-flex items-center gap-2"><span>▶️</span> TBM 오디오 브리핑 생성</button>
-                                    <div id="audio-loading" class="hidden mt-3 text-purple-600 text-sm font-bold flex justify-center items-center gap-2"><div class="sound-wave"><span></span><span></span><span></span><span></span></div> 오디오 합성 중...</div>
-                                    <audio id="audio-player" controls class="hidden w-full mt-4 h-10 rounded-full shadow-sm"></audio>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Feature 3: AI Near-miss/Accident Report Generator -->
+                    <!-- Feature 3: AI Incident Report Generator (Updated for TO-5i) -->
                     <div class="bg-red-50 p-6 rounded-xl border border-red-200 mb-6 relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">Gemini AI ✨</div>
-                        <h3 class="font-bold text-lg mb-2 text-red-900">📝 AI 아차사고/사고 보고서 작성기</h3>
-                        <p class="text-sm text-red-700 mb-4">발생한 상황에 대한 몇 가지 키워드를 입력하면 S-283 지침에 부합하는 공식 보고서 초안을 작성합니다.</p>
+                        <h3 class="font-bold text-lg mb-2 text-red-900">📝 AI 사고/아차사고 보고서 작성기 (TO-5)</h3>
+                        <p class="text-sm text-red-700 mb-4">발생한 상황을 키워드로 간략히 입력하면, TO-5i 지침(근본 원인 분석, 아차 사고 심각도 분류 등)에 부합하는 공식 보고서 초안을 자동 작성합니다.</p>
                         <div class="space-y-4">
-                            <input type="text" id="ai-report-keywords" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none shadow-inner" placeholder="예: 사다리 미끄러짐, 발목 접지름, 2층 복도">
-                            <button onclick="generateSafetyReport()" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm">보고서 초안 생성 ✨</button>
-                            <div id="ai-report-loading" class="hidden flex items-center gap-3 text-red-600 text-sm font-bold p-4 bg-white rounded-lg shadow-sm border border-red-100"><div class="spinner !border-l-red-600"></div> 보고서를 작성 중입니다...</div>
-                            <div id="ai-report-output" class="hidden bg-white p-5 rounded-lg shadow-md border border-red-200 text-sm whitespace-pre-wrap leading-relaxed text-slate-700">
+                            <textarea id="ai-incident-notes" rows="4" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none shadow-inner" placeholder="어제 오후 2시 왕국회관, 형제가 전구 교체 중 사다리에서 미끄러짐. 다치지 않았으나 넘어질 뻔함(아차 사고). 바닥에 물기가 있었음."></textarea>
+                            <button onclick="generateIncidentReport()" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm">보고서 초안 생성 ✨</button>
+                            <div id="ai-incident-loading" class="hidden flex items-center gap-3 text-red-600 text-sm font-bold p-4 bg-white rounded-lg shadow-sm border border-red-100"><div class="spinner !border-l-red-600"></div> 보고서를 작성 중입니다...</div>
+                            <div id="ai-incident-output" class="hidden bg-white p-5 rounded-lg shadow-md border border-red-200 text-sm prose prose-sm max-w-none leading-relaxed text-slate-700">
                             </div>
                         </div>
                     </div>

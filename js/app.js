@@ -10,15 +10,67 @@ window.calcLadder = calcLadder;
 window.showPPE = showPPE;
 window.analyzeImageWithAI = analyzeImageWithAI;
 window.analyzeRiskWithAI = analyzeRiskWithAI;
-window.generateAudioBriefing = generateAudioBriefing;
 window.generateSafetyReport = generateSafetyReport;
+window.generateIncidentReport = generateIncidentReport;
 window.sendChatMessage = sendChatMessage;
 window.generateCustomQuiz = generateCustomQuiz;
+window.toggleSidebar = toggleSidebar;
+window.goBack = goBack;
+
+// --- Navigation History ---
+let navigationHistory = ['dashboard'];
+
+// --- Sidebar Toggle Logic ---
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    // Toggle hidden for overlay display
+    if (overlay.classList.contains('active')) {
+        overlay.classList.remove('hidden');
+    } else {
+        setTimeout(() => {
+            if (!overlay.classList.contains('active')) {
+                overlay.classList.add('hidden');
+            }
+        }, 300);
+    }
+}
 
 // --- Navigation Logic ---
-function navigate(sectionId) {
+function navigate(sectionId, isBack = false) {
+    // Close sidebar on mobile after navigation
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar && sidebar.classList.contains('active')) {
+        toggleSidebar();
+    }
+
+    // Update history
+    if (!isBack) {
+        if (navigationHistory[navigationHistory.length - 1] !== sectionId) {
+            navigationHistory.push(sectionId);
+        }
+    }
+
+    // Toggle Back Button visibility
+    const backBtn = document.getElementById('back-btn');
+    if (backBtn) {
+        if (navigationHistory.length > 1) {
+            backBtn.classList.remove('hidden');
+        } else {
+            backBtn.classList.add('hidden');
+        }
+    }
+
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-    document.getElementById(sectionId).classList.remove('hidden');
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    }
     
     document.querySelectorAll('#sidebar .nav-item').forEach(btn => {
         btn.classList.remove('bg-white', 'shadow-sm', 'text-blue-600', 'text-purple-600', 'text-emerald-600', 'font-bold');
@@ -30,13 +82,26 @@ function navigate(sectionId) {
         document.getElementById('quiz-custom-gen')?.classList.remove('hidden');
     }
 
-    const activeBtn = event.currentTarget;
-    if (activeBtn && activeBtn.classList) {
-        activeBtn.classList.remove('text-slate-600');
-        activeBtn.classList.add('bg-white', 'shadow-sm', 'font-bold');
-        if (sectionId.includes('ai') || sectionId === 'overseer') activeBtn.classList.add('text-purple-600');
-        else if (sectionId === 'quiz-section') activeBtn.classList.add('text-emerald-600');
-        else activeBtn.classList.add('text-blue-600');
+    // Try to find matching nav item in sidebar
+    const navItems = document.querySelectorAll('#sidebar .nav-item');
+    navItems.forEach(btn => {
+        // Simple heuristic: check if the onclick call contains the sectionId
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`'${sectionId}'`)) {
+            btn.classList.remove('text-slate-600');
+            btn.classList.add('bg-white', 'shadow-sm', 'font-bold');
+            if (sectionId.includes('ai') || sectionId === 'overseer') btn.classList.add('text-purple-600');
+            else if (sectionId === 'quiz-section') btn.classList.add('text-emerald-600');
+            else btn.classList.add('text-blue-600');
+        }
+    });
+}
+
+function goBack() {
+    if (navigationHistory.length > 1) {
+        navigationHistory.pop(); // Remove current
+        const previousSection = navigationHistory[navigationHistory.length - 1];
+        navigate(previousSection, true);
     }
 }
 
@@ -106,7 +171,12 @@ function selectAnswer(selectedIndex, btnElement) {
         btnElement.classList.add('text-emerald-700');
         score++;
         document.getElementById('quiz-explanation-box').className = 'mt-6 p-4 rounded-lg border text-sm bg-emerald-50 border-emerald-200 fade-in';
-        document.getElementById('quiz-explanation-text').innerHTML = `<span class="text-emerald-700 font-bold">✅ 정답입니다!</span><br><br>${qData.exp}`;
+        let expHtml = `<span class="text-emerald-700 font-bold">✅ 정답입니다!</span><br><br>`;
+        if (qData.img) {
+            expHtml += `<img src="${qData.img}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-sm border border-emerald-100" alt="참고 이미지">`;
+        }
+        expHtml += qData.exp;
+        document.getElementById('quiz-explanation-text').innerHTML = expHtml;
     } else {
         btnElement.classList.replace('border-stone-200', 'border-red-500');
         btnElement.classList.replace('bg-white', 'bg-red-50');
@@ -117,7 +187,12 @@ function selectAnswer(selectedIndex, btnElement) {
         allBtns[qData.answer].classList.replace('bg-white', 'bg-emerald-50');
         
         document.getElementById('quiz-explanation-box').className = 'mt-6 p-4 rounded-lg border text-sm bg-red-50 border-red-200 fade-in';
-        document.getElementById('quiz-explanation-text').innerHTML = `<span class="text-red-700 font-bold">❌ 오답입니다.</span><br><span class="text-slate-600 mt-1 block">정답: ${qData.answer + 1}번</span><br>${qData.exp}`;
+        let expHtml = `<span class="text-red-700 font-bold">❌ 오답입니다.</span><br><span class="text-slate-600 mt-1 block mb-3">정답: ${qData.answer + 1}번</span>`;
+        if (qData.img) {
+            expHtml += `<img src="${qData.img}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-sm border border-red-100" alt="참고 이미지">`;
+        }
+        expHtml += qData.exp;
+        document.getElementById('quiz-explanation-text').innerHTML = expHtml;
     }
 
     // Update score text immediately
@@ -168,9 +243,10 @@ function showQuizResult() {
 
 
 // --- Gemini API Setup & AI Features ---
-const apiKey = "";
-const GEMINI_TEXT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
-const GEMINI_TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"; 
+const apiKey = "AIzaSyCHkLJcF15XfNsMjNGAuLV2eIDED_vZAqQ"; // 본인의 실제 API 키로 교체 필요
+const GEMINI_TEXT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+const GEMINI_TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
+
 
 // --- AI Report Generator Logic ---
 async function generateSafetyReport() {
@@ -195,6 +271,7 @@ async function generateSafetyReport() {
     전문적이고 격식 있는 한국어 문체로 작성해 주세요.`;
 
     try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -203,13 +280,67 @@ async function generateSafetyReport() {
             })
         });
         const text = response.candidates[0].content.parts[0].text;
-        output.innerText = text;
+        output.innerHTML = `<div class="prose prose-sm max-w-none">${marked.parse(text)}</div>`;
         output.classList.remove('hidden');
     } catch (error) {
-        console.error(error);
-        alert("보고서 생성 중 오류가 발생했습니다.");
+        console.error("Report Generation Error:", error);
+        alert(`보고서 생성 중 오류가 발생했습니다: ${error.message}`);
     } finally {
         loading.classList.add('hidden');
+    }
+}
+
+// --- 4. Incident Report Generator (Updated for TO-5i) ---
+async function generateIncidentReport() {
+    const notes = document.getElementById('ai-incident-notes').value.trim();
+    if (!notes) return alert("발생한 상황을 입력해주세요.");
+
+    document.getElementById('ai-incident-loading').classList.remove('hidden');
+    document.getElementById('ai-incident-output').classList.add('hidden');
+
+    const prompt = `당신은 능숙한 현장 안전 관리자입니다. 아래 사용자가 입력한 상황 메모를 바탕으로 'TO-5i 위험 및 사고 보고서 지침'에 따라 보고서를 작성해 주세요.
+
+[지침 핵심 사항]
+1. '아차 사고(Near-Miss)'인 경우, TO-5i 11항에 따라 잠재적 피해 심각도를 '보통($5,000 이하)', '심각', '대형', '매우 중대' 중 하나로 평가하십시오.
+2. '근본 원인' 분석 시, 단순히 '미끄러짐' 같은 초기 원인뿐 아니라 '바닥 물기 방치', '안전 교육 부족' 등 선행 사건을 포함하세요 (TO-5i 13항).
+3. '예방 조처'는 구체적이고 실현 가능해야 합니다 (TO-5i 15항).
+
+[보고서 양식]
+1. 사고 개요 (일시, 장소, 유형: 부상/자산피해/아차사고)
+2. 상세 내용 (6하 원칙에 의거한 상세 서술)
+3. 아차 사고 심각도 평가 (해당 시)
+4. 근본 원인 분석 (Root Cause)
+5. 향후 예방 대책 (Safety Factor)
+6. 조치 사항 (응급 처치, 보고 여부 등)
+
+사용자 메모: ${notes}
+
+전문적이고 명확한 한국어 보고서체로 작성해 주세요.`;
+
+    const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3 }
+    };
+
+    try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다.");
+        const result = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const report = result.candidates[0].content.parts[0].text;
+        // Simple formatting for bold text and parsing markdown
+        const outputElement = document.getElementById('ai-incident-output');
+        outputElement.innerHTML = marked.parse(report);
+        
+        document.getElementById('ai-incident-loading').classList.add('hidden');
+        document.getElementById('ai-incident-output').classList.remove('hidden');
+    } catch(e) {
+        console.error(e);
+        document.getElementById('ai-incident-loading').classList.add('hidden');
+        alert("보고서 생성 중 오류가 발생했습니다.");
     }
 }
 
@@ -235,18 +366,18 @@ async function generateCustomQuiz() {
     ]`;
 
     try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    response_mime_type: "application/json"
-                }
+                contents: [{ parts: [{ text: prompt }] }]
             })
         });
         
-        const jsonText = response.candidates[0].content.parts[0].text;
+        let jsonText = response.candidates[0].content.parts[0].text;
+        // Clean up markdown code blocks if the AI included them despite the config
+        jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
         const newQuestions = JSON.parse(jsonText);
         
         // Replace current quiz data and start
@@ -257,8 +388,8 @@ async function generateCustomQuiz() {
         // Hide the custom gen UI during quiz
         document.getElementById('quiz-custom-gen').classList.add('hidden');
     } catch (error) {
-        console.error(error);
-        alert("퀴즈 생성 중 오류가 발생했습니다.");
+        console.error("Quiz Generation Error:", error);
+        alert(`퀴즈 생성 중 오류가 발생했습니다: ${error.message}`);
     } finally {
         loading.classList.add('hidden');
     }
@@ -269,9 +400,18 @@ async function fetchWithRetry(url, options, retries = 5) {
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(url, options);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
+            const data = await response.json();
+            
+            if (!response.ok) {
+                const errorMsg = data.error?.message || `HTTP error! status: ${response.status}`;
+                throw new Error(errorMsg);
+            }
+            return data;
         } catch (e) {
+            // 400 errors (like invalid API key) shouldn't be retried
+            if (e.message.includes('400') || e.message.toLowerCase().includes('api key')) {
+                throw e;
+            }
             if (i === retries - 1) throw e;
             await new Promise(res => setTimeout(res, delays[i]));
         }
@@ -282,17 +422,21 @@ async function fetchWithRetry(url, options, retries = 5) {
 let currentImageBase64 = null;
 document.getElementById('hazard-image')?.addEventListener('change', function(e) {
     const file = e.target.files[0];
+    const labelText = document.getElementById('file-label-text');
     if (file) {
+        if (labelText) labelText.innerText = "사진이 촬영(선택)되었습니다";
         const reader = new FileReader();
         reader.onload = function(event) {
             const img = document.getElementById('image-preview');
             img.src = event.target.result;
             img.classList.remove('hidden');
-            currentImageBase64 = event.target.result.split(',')[1]; 
+            currentImageBase64 = event.target.result.split(',')[1];
             document.getElementById('btn-analyze-img').classList.remove('hidden');
             document.getElementById('ai-vision-output').classList.add('hidden');
         }
         reader.readAsDataURL(file);
+    } else {
+        if (labelText) labelText.innerText = "현장 사진 촬영 또는 선택";
     }
 });
 
@@ -306,6 +450,7 @@ async function analyzeImageWithAI() {
     const prompt = "이 현장 사진에서 안전 위반 사항이나 위험 요소를 식별하고 권고 사항을 알려주세요. JSON 형식으로 'hazards'와 'recommendations' 배열을 응답하세요.";
 
     try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -315,11 +460,12 @@ async function analyzeImageWithAI() {
                         { text: prompt },
                         { inline_data: { mime_type: "image/jpeg", data: currentImageBase64 } }
                     ]
-                }],
-                generationConfig: { response_mime_type: "application/json" }
+                }]
             })
         });
-        const result = JSON.parse(response.candidates[0].content.parts[0].text);
+        let jsonText = response.candidates[0].content.parts[0].text;
+        jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const result = JSON.parse(jsonText);
         
         const hazardList = document.getElementById('ai-vision-hazards');
         const recoList = document.getElementById('ai-vision-recommendations');
@@ -328,8 +474,8 @@ async function analyzeImageWithAI() {
         
         output.classList.remove('hidden');
     } catch (e) {
-        console.error(e);
-        alert("이미지 분석 중 오류 발생");
+        console.error("Image Analysis Error:", e);
+        alert(`이미지 분석 중 오류 발생: ${e.message}`);
     } finally {
         loading.classList.add('hidden');
     }
@@ -346,43 +492,26 @@ async function analyzeRiskWithAI() {
     const prompt = `작업: "${task}". 이 작업의 잠재적 위험 요소와 안전 대책을 한국어로 제안해 주세요. JSON 형식: { "hazards": [], "controls": [] }`;
 
     try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { response_mime_type: "application/json" }
+                contents: [{ parts: [{ text: prompt }] }]
             })
         });
-        const result = JSON.parse(response.candidates[0].content.parts[0].text);
+        let jsonText = response.candidates[0].content.parts[0].text;
+        jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const result = JSON.parse(jsonText);
         document.getElementById('ai-risk-hazards').innerHTML = result.hazards.map(h => `<li>${h}</li>`).join('');
         document.getElementById('ai-risk-controls').innerHTML = result.controls.map(c => `<li>${c}</li>`).join('');
         output.classList.remove('hidden');
     } catch (e) {
-        console.error(e);
+        console.error("Risk Assessment Error:", e);
+        alert(`위험성 평가 중 오류 발생: ${e.message}`);
     } finally {
         loading.classList.add('hidden');
     }
-}
-
-async function generateAudioBriefing() {
-    const hazards = Array.from(document.querySelectorAll('#ai-risk-hazards li')).map(li => li.innerText).join(', ');
-    const controls = Array.from(document.querySelectorAll('#ai-risk-controls li')).map(li => li.innerText).join(', ');
-    if (!hazards) return;
-
-    const loading = document.getElementById('audio-loading');
-    const player = document.getElementById('audio-player');
-    loading.classList.remove('hidden');
-    player.classList.add('hidden');
-
-    const prompt = `위험 요소: ${hazards}. 대책: ${controls}. 이 내용을 바탕으로 현장 툴박스 미팅(TBM)을 위한 짧고 명확한 음성 브리핑 스크립트를 작성하고 오디오 데이터(WAV base64)를 생성해 주세요. (주의: 실제 API 구현에 따라 텍스트만 생성하거나 별도 TTS 서비스 사용 가능)`;
-    // (Note: Standard Gemini API doesn't directly return WAV base64 in this way, 
-    // this is a placeholder logic for where a TTS integration would go)
-    
-    setTimeout(() => {
-        loading.classList.add('hidden');
-        alert("이 기능은 실제 프로젝트에서 별도의 TTS API 연동이 필요합니다.");
-    }, 2000);
 }
 
 function appendChatMessage(message, isUser = false) {
@@ -391,7 +520,7 @@ function appendChatMessage(message, isUser = false) {
     div.className = "flex items-start gap-3 " + (isUser ? "flex-row-reverse" : "");
     div.innerHTML = `
         <div class="w-8 h-8 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${isUser ? "bg-blue-100" : "bg-purple-100"}">${isUser ? "👤" : "✨"}</div>
-        <div class="${isUser ? "bg-blue-600 text-white rounded-tr-none" : "bg-stone-50 border border-stone-200 rounded-tl-none"} rounded-lg p-3 text-sm max-w-[85%]">${message}</div>
+        <div class="${isUser ? "bg-blue-600 text-white rounded-tr-none" : "bg-stone-50 border border-stone-200 rounded-tl-none"} rounded-lg p-3 text-sm max-w-[85%] ${isUser ? "" : "prose prose-sm max-w-none"}">${message}</div>
     `;
     history.appendChild(div);
     history.scrollTop = history.scrollHeight;
@@ -408,20 +537,34 @@ async function sendChatMessage() {
     const prompt = `당신은 '신권 안전 비서'입니다. DC-82 및 S-283 가이드라인을 바탕으로 다음 질문에 친절하고 전문적으로 답변해 주세요: ${msg}`;
 
     try {
+        if (!apiKey) throw new Error("API 키가 설정되지 않았습니다. js/app.js 파일에서 apiKey를 입력해 주세요.");
         const response = await fetchWithRetry(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
         const text = response.candidates[0].content.parts[0].text;
-        appendChatMessage(text, false);
+        appendChatMessage(marked.parse(text), false);
     } catch (e) {
-        appendChatMessage("죄송합니다. 오류가 발생했습니다.");
+        console.error("Chat Error:", e);
+        appendChatMessage(`죄송합니다. 오류가 발생했습니다: ${e.message}`);
     }
 }
 
 // Initial setup for existing interactive elements
 window.addEventListener('load', () => {
+    // Mobile Menu Button Event
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    if (menuBtn) {
+        menuBtn.onclick = toggleSidebar;
+    }
+
+    // Overlay click to close sidebar
+    const overlay = document.getElementById('sidebar-overlay');
+    if (overlay) {
+        overlay.onclick = toggleSidebar;
+    }
+
     const ctxCulture = document.getElementById('safetyCultureChart');
     if(ctxCulture) {
         new Chart(ctxCulture.getContext('2d'), {
