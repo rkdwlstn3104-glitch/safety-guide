@@ -1,5 +1,2 @@
-/* Netlify Redirects for Single Page Application */
-/* This ensures that all routes are redirected to index.html if using client-side routing,
-   though this app seems to use internal state navigation. 
-   However, it's good practice for Vite projects. */
-/* /index.html 200 */
+/usermanual.html /usermanual.html 200
+/* /index.html 200
