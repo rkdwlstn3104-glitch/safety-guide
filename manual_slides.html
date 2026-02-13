@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신권 안전 가이드 - 사용자 메뉴얼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar {
+            display: none;
+        }
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        section:nth-child(odd) {
+            background-color: #2d3436;
+        }
+        section:nth-child(even) {
+            background-color: #0984e3;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            word-break: keep-all;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #fab1a0;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 800px;
+            margin-bottom: 15px;
+            word-break: keep-all;
+        }
+        .feature-list {
+            text-align: left;
+            display: inline-block;
+            max-width: 800px;
+        }
+        .feature-item {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .feature-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #fab1a0;
+        }
+        .nav-dots {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dot.active {
+            background-color: #ffffff;
+            transform: scale(1.3);
+        }
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            opacity: 0.7;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+            40% {transform: translateY(-10px) translateX(-50%);}
+            60% {transform: translateY(-50%) translateX(-50%);}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-dots" id="navDots"></div>
+
+    <div class="container" id="mainContainer">
+        <!-- Slide 1: Intro -->
+        <section id="slide-1">
+            <h1>[신권 안전 가이드]<br>사용자 메뉴얼</h1>
+            <p>본 문서는 '신권 안전 가이드' 웹 애플리케이션의 주요 기능과 사용 방법을 설명합니다.</p>
+            <p>DC-82 및 S-283 표준을 기반으로 자원봉사자들의 안전을 돕기 위해 설계되었습니다.</p>
+            <div class="scroll-hint">▼ 아래로 스크롤하여 계속하기</div>
+        </section>
+
+        <!-- Slide 2: Main Menu 1 -->
+        <section id="slide-2">
+            <h2>1. 주요 메뉴 및 내비게이션</h2>
+            <div class="feature-list">
+                <div class="feature-item"><strong>대시보드:</strong> 안전 사고 예방 핵심 요소와 Hierarchy of Controls 시각화</div>
+                <div class="feature-item"><strong>기본 안전 표준:</strong> PPE 착용법, 개인 건강 위생, 복장 규정 수칙</div>
+                <div class="feature-item"><strong>고위험 작업:</strong> 1.8m 고소 작업 및 전기 작업(LOTO) 수칙</div>
+                <div class="feature-item"><strong>시설 유지보수:</strong> 낙상 방지, 야외 작업, 화학 물질, 화재 예방 지침</div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Main Menu 2 -->
+        <section id="slide-3">
+            <h2>주요 메뉴 (계속)</h2>
+            <div class="feature-list">
+                <div class="feature-item"><strong>감독자 도구:</strong> AI 기술을 활용한 현장 관리 도구 모음</div>
+                <div class="feature-item"><strong>AI 안전 비서:</strong> 안전 관련 궁금증 실시간 채팅 답변</div>
+                <div class="feature-item"><strong>안전 지식 퀴즈:</strong> 20문항의 퀴즈를 통한 지식 점검</div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Detailed Features 1 -->
+        <section id="slide-4">
+            <h2>2. 주요 기능 상세 설명</h2>
+            <div class="feature-list">
+                <div class="feature-item"><strong>사다리 4:1 법칙 계산기:</strong> 높이 입력 시 안전한 이격 거리를 자동으로 계산</div>
+                <div class="feature-item"><strong>인터랙티브 PPE 선택기:</strong> 인체 부위별 아이콘 클릭으로 올바른 장비 착용법 확인</div>
+            </div>
+        </section>
+
+        <!-- Slide 5: AI Tools (Gemini) -->
+        <section id="slide-5">
+            <h2>감독자 전용 AI 도구 (Gemini)</h2>
+            <div class="feature-list">
+                <div class="feature-item"><strong>현장 위험 사진 분석:</strong> 사진 업로드 시 AI가 위험 요소 및 개선 사항 분석</div>
+                <div class="feature-item"><strong>스마트 위험성 평가:</strong> 텍스트 입력 기반 잠재적 위험 및 대책 제안</div>
+                <div class="feature-item"><strong>TBM 오디오 브리핑:</strong> 현장 미팅용 스크립트 및 음성 브리핑 생성</div>
+                <div class="feature-item"><strong>AI 사고 보고서 작성기:</strong> S-283 지침에 맞는 공식 보고서 초안 생성</div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Quiz -->
+        <section id="slide-6">
+            <h2>안전 지식 퀴즈</h2>
+            <div class="feature-list">
+                <div class="feature-item"><strong>기본 20문항 퀴즈:</strong> 학습 내용 기반 점수 확인 및 정답 해설</div>
+                <div class="feature-item"><strong>AI 맞춤형 퀴즈:</strong> 특정 주제 입력 시 AI가 즉석에서 5문항 생성</div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Precautions -->
+        <section id="slide-7">
+            <h2>3. 사용 주의사항</h2>
+            <div class="feature-list">
+                <div class="feature-item">AI 분석 결과는 참고용이며, 최종 책임은 현장 감독자에게 있습니다.</div>
+                <div class="feature-item">고위험 작업은 만 18세 이상의 숙련된 작업자만 수행 가능합니다.</div>
+            </div>
+            <p style="margin-top: 30px; font-weight: bold;">무사고(Zero Accident)를 목표로 함께 노력합시다.</p>
+        </section>
+    </div>
+
+    <script>
+        const container = document.getElementById('mainContainer');
+        const sections = document.querySelectorAll('section');
+        const navDots = document.getElementById('navDots');
+
+        // Create dots
+        sections.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                sections[i].scrollIntoView({ behavior: 'smooth' });
+            });
+            navDots.appendChild(dot);
+        });
+
+        // Update dots on scroll
+        container.addEventListener('scroll', () => {
+            const index = Math.round(container.scrollTop / window.innerHeight);
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        });
+    </script>
+</body>
+</html>

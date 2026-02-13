@@ -133,6 +133,11 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Fix sidebar visibility and scrolling on mobile */
+#sidebar {
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+}
+
 /* Fix mobile view clipping when added to home screen */
 main#main-content {
     padding-bottom: calc(5rem + env(safe-area-inset-bottom));

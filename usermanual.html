@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신권 안전 가이드 인포그래픽</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- 
+        Palette Selected: Energetic Blue & Safety Yellow
+        Primary Blue: #1E3A8A (Blue-900)
+        Accent Blue: #3B82F6 (Blue-500)
+        Safety Yellow: #FBBF24 (Amber-400)
+        Alert Orange: #F97316 (Orange-500)
+        Background: #F3F4F6 (Gray-100)
+        Surface: #FFFFFF
+    -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+        
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Default height */
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Utilities */
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation / Header -->
+    <nav class="bg-blue-900 text-white sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold tracking-wider">🛡️ 신권 안전 가이드</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <span class="px-3 py-2 rounded-md text-sm font-medium bg-blue-800">DC-82 & S-283 표준 준수</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- 1. Introduction Section -->
+        <section class="text-center space-y-4 mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-blue-900 leading-tight">
+                자원봉사자 안전을 위한<br><span class="text-blue-500">스마트 솔루션</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                본 가이드는 DC-82 및 S-283 표준을 기반으로 설계되었습니다. 
+                <br>우리의 목표는 <strong>무사고(Zero Accident)</strong>입니다. 
+                AI 기술과 체계적인 데이터 분석을 통해 더 안전한 봉사 환경을 만듭니다.
+            </p>
+        </section>
+
+        <!-- 2. Hierarchy of Controls (Pyramid/Funnel) -->
+        <section>
+            <div class="mb-6 border-l-4 border-blue-500 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">위험 통제 계층 (Hierarchy of Controls)</h2>
+                <p class="text-gray-600 mt-2">
+                    안전 사고 예방을 위해 대시보드에서 강조하는 핵심 원칙입니다. 
+                    가장 효과적인 '제거' 단계부터 최후의 수단인 'PPE'까지, 우리는 상위 단계의 통제를 우선시합니다.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart -->
+                <div class="lg:col-span-2 card">
+                    <div id="hierarchyChart" class="w-full h-[400px]"></div> <!-- Plotly Container -->
+                </div>
+                <!-- Description -->
+                <div class="space-y-4">
+                    <div class="card bg-blue-50 border-l-4 border-blue-600">
+                        <h3 class="font-bold text-blue-900">1. 제거 (Elimination)</h3>
+                        <p class="text-sm text-gray-700">위험 요소를 물리적으로 완전히 제거합니다. 가장 효과적인 방법입니다.</p>
+                    </div>
+                    <div class="card bg-blue-50 border-l-4 border-blue-400">
+                        <h3 class="font-bold text-blue-800">2. 대체 (Substitution)</h3>
+                        <p class="text-sm text-gray-700">위험한 것을 덜 위험한 것으로 바꿉니다.</p>
+                    </div>
+                    <div class="card bg-amber-50 border-l-4 border-amber-400">
+                        <h3 class="font-bold text-amber-800">3. 공학적/관리적 통제</h3>
+                        <p class="text-sm text-gray-700">사람을 위험과 분리하거나 작업 방식을 변경합니다.</p>
+                    </div>
+                    <div class="card bg-orange-50 border-l-4 border-orange-500">
+                        <h3 class="font-bold text-orange-800">4. PPE (보호 장비)</h3>
+                        <p class="text-sm text-gray-700">작업자를 보호하는 최후의 수단입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. App Ecosystem Breakdown -->
+        <section>
+            <div class="mb-6 border-l-4 border-amber-400 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">주요 기능 구성</h2>
+                <p class="text-gray-600 mt-2">
+                    신권 안전 가이드 앱은 예방, 교육, 그리고 실시간 관리를 위한 6가지 핵심 모듈로 구성되어 있습니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="card">
+                    <div class="chart-container">
+                        <canvas id="menuDoughnutChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-2xl">📊</div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">대시보드 & 감독자 도구</h3>
+                            <p class="text-gray-600">위험성 평가 및 AI 기반 현장 분석을 통해 사고를 미연에 방지합니다.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center text-2xl">⚡</div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">고위험 작업 관리</h3>
+                            <p class="text-gray-600">1.8m 이상 고소 작업 및 전기 작업(LOTO)에 대한 엄격한 절차를 제공합니다.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-2xl">🧠</div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">AI 비서 & 퀴즈</h3>
+                            <p class="text-gray-600">실시간 질의응답과 20문항 퀴즈를 통해 안전 지식을 지속적으로 강화합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. High Risk Focus: Ladder Safety -->
+        <section>
+            <div class="mb-6 border-l-4 border-red-500 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">고위험 작업: 사다리 4:1 법칙</h2>
+                <p class="text-gray-600 mt-2">
+                    사다리 작업은 주요 낙상 사고 원인 중 하나입니다. 앱 내 '계산기' 기능을 통해 높이에 따른 안전한 하단 이격 거리를 자동으로 산출합니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card">
+                    <div class="chart-container">
+                        <canvas id="ladderChart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        *사다리 높이가 4m일 때, 벽에서 1m 떨어져야 가장 안전합니다.
+                    </p>
+                </div>
+                <div class="card bg-gray-800 text-white flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-amber-400">⚠️ 고위험 작업 필수 수칙</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-center">
+                            <span class="mr-3 text-2xl">🔞</span>
+                            <span>만 18세 이상 숙련된 작업자만 수행</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="mr-3 text-2xl">👷</span>
+                            <span>감독자 승인 및 2인 1조 작업 필수</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="mr-3 text-2xl">📐</span>
+                            <span>4:1 법칙 준수 (높이 4 : 거리 1)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="mr-3 text-2xl">🪖</span>
+                            <span>필수 PPE 착용 (안전모, 안전대 등)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. AI & Maintenance Tools -->
+        <section>
+            <div class="mb-6 border-l-4 border-purple-500 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">감독자 AI 도구 및 시설 유지보수</h2>
+                <p class="text-gray-600 mt-2">
+                    최신 Gemini AI 기술을 활용하여 현장의 위험 요소를 식별하고, 시설 관리의 다양한 영역을 체계적으로 지원합니다.
+                </p>
+            </div>
+
+            <!-- AI Features Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card bg-gradient-to-br from-blue-50 to-white border border-blue-100">
+                    <div class="text-4xl mb-4">📷</div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">위험 사진 분석</h3>
+                    <p class="text-sm text-gray-600">현장 사진을 업로드하면 AI가 위험 요소를 식별하고 개선안을 제안합니다.</p>
+                </div>
+                <div class="card bg-gradient-to-br from-blue-50 to-white border border-blue-100">
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">스마트 위험성 평가</h3>
+                    <p class="text-sm text-gray-600">작업 내용을 텍스트로 입력하면 잠재적 위험과 대책을 자동 생성합니다.</p>
+                </div>
+                <div class="card bg-gradient-to-br from-blue-50 to-white border border-blue-100">
+                    <div class="text-4xl mb-4">📑</div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">보고서 자동 작성</h3>
+                    <p class="text-sm text-gray-600">키워드 입력만으로 S-283 지침에 맞는 공식 사고 보고서 초안을 작성합니다.</p>
+                </div>
+            </div>
+
+            <!-- Maintenance Treemap -->
+            <div class="card">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">시설 유지보수 관리 영역</h3>
+                <div id="maintenanceTreemap" class="w-full h-[350px]"></div>
+            </div>
+        </section>
+
+        <!-- 6. Knowledge & Verification -->
+        <section>
+            <div class="mb-6 border-l-4 border-green-500 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">안전 지식 점검 (Quiz)</h2>
+                <p class="text-gray-600 mt-2">
+                    단순한 정보 전달을 넘어, 퀴즈를 통해 실제 이해도를 점검합니다. 아래는 안전 퀴즈의 주요 평가 항목 예시입니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4 order-2 md:order-1">
+                    <div class="card bg-green-50">
+                        <h4 class="font-bold text-green-900 mb-2">📝 맞춤형 퀴즈 생성</h4>
+                        <p class="text-sm text-gray-700">
+                            특정 주제(예: "전기", "화학 물질")를 입력하면 AI가 즉석에서 5문항의 퀴즈를 생성하여 취약 분야를 집중 학습할 수 있습니다.
+                        </p>
+                    </div>
+                    <div class="card bg-green-50">
+                        <h4 class="font-bold text-green-900 mb-2">✅ PPE 선택기</h4>
+                        <p class="text-sm text-gray-700">
+                            인체 모형을 클릭하여 머리부터 발끝까지 각 부위에 맞는 보호 장비를 올바르게 선택하는 훈련을 제공합니다.
+                        </p>
+                    </div>
+                </div>
+                <div class="card order-1 md:order-2">
+                    <div class="chart-container">
+                        <canvas id="quizRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-16 bg-gray-800 text-gray-300 py-12 rounded-t-3xl">
+            <div class="max-w-4xl mx-auto px-6 text-center space-y-6">
+                <h3 class="text-2xl font-bold text-white">"안전은 선택이 아닌 필수입니다"</h3>
+                <p>
+                    본 애플리케이션의 AI 분석 결과는 참고용이며, 최종 결정과 책임은 현장 감독자 및 자격을 갖춘 전문가에게 있습니다.<br>
+                    안전한 작업 환경을 위해 항상 DC-82 및 S-283 가이드라인을 준수해 주시기 바랍니다.
+                </p>
+                <div class="pt-6 border-t border-gray-700">
+                    <p class="text-sm">© 신권 안전 가이드 | 무사고(Zero Accident) 캠페인</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript for Charts -->
+    <script>
+        // --- Utility Function: Label Wrapping for Chart.js ---
+        function wrapLabels(labels, maxChars) {
+            return labels.map(label => {
+                if (label.length <= maxChars) return label;
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    if (currentLine.length + 1 + words[i].length <= maxChars) {
+                        currentLine += ' ' + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            });
+        }
+
+        // --- Common Chart.js Tooltip Options (Mandatory) ---
+        const commonTooltipOptions = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // 1. Plotly Funnel Chart: Hierarchy of Controls
+        // Using Plotly as it handles funnel/pyramid shapes better than standard Chart.js
+        const hierarchyData = [{
+            type: 'funnel',
+            y: ['제거 (Elimination)', '대체 (Substitution)', '공학적 통제', '관리적 통제', 'PPE (보호구)'],
+            x: [100, 80, 60, 40, 20], // Illustrative values for visual sizing
+            textinfo: "y",
+            hoverinfo: "y+text",
+            text: ["가장 효과적", "위험 요소 교체", "격리 및 차단", "절차 변경", "최후의 수단"],
+            marker: {
+                color: ["#1E3A8A", "#2563EB", "#3B82F6", "#F59E0B", "#EF4444"], // Blue scale to Orange/Red
+            }
+        }];
+
+        const hierarchyLayout = {
+            margin: {l: 150, r: 20, t: 20, b: 20},
+            funnelmode: "stack",
+            showlegend: false,
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Noto Sans KR' }
+        };
+
+        // Render with config to enforce Canvas/WebGL where possible, though Funnel is often SVG based in Plotly.
+        // Note: Plotly JS generally renders layout in SVG, but we avoid "user-generated" SVG graphics. 
+        // Plotly is a permitted library.
+        Plotly.newPlot('hierarchyChart', hierarchyData, hierarchyLayout, {displayModeBar: false, responsive: true});
+
+
+        // 2. Chart.js Doughnut: App Ecosystem
+        const ctxDoughnut = document.getElementById('menuDoughnutChart').getContext('2d');
+        const rawMenuLabels = ['대시보드 (현황 파악)', '기본 안전 표준 (PPE)', '고위험 작업 (사다리/전기)', '시설 유지보수 (관리)', 'AI 감독자 도구', '안전 지식 퀴즈'];
+        
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: wrapLabels(rawMenuLabels, 16),
+                datasets: [{
+                    data: [15, 15, 25, 20, 15, 10], // Illustrative weight of importance/content
+                    backgroundColor: [
+                        '#1E3A8A', // Dashboard - Dark Blue
+                        '#3B82F6', // Standards - Blue
+                        '#EF4444', // High Risk - Red
+                        '#10B981', // Maintenance - Green
+                        '#8B5CF6', // AI - Purple
+                        '#F59E0B'  // Quiz - Yellow
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: { family: 'Noto Sans KR', size: 11 },
+                            boxWidth: 12
+                        }
+                    },
+                    tooltip: commonTooltipOptions
+                }
+            }
+        });
+
+        // 3. Chart.js Bar Chart: Ladder 4:1 Rule
+        const ctxLadder = document.getElementById('ladderChart').getContext('2d');
+        
+        new Chart(ctxLadder, {
+            type: 'bar',
+            data: {
+                labels: ['사다리 높이 2m', '사다리 높이 4m', '사다리 높이 6m', '사다리 높이 8m'],
+                datasets: [{
+                    label: '안전 이격 거리 (벽에서 떨어진 거리)',
+                    data: [0.5, 1.0, 1.5, 2.0], // The math: Height / 4
+                    backgroundColor: '#F59E0B',
+                    borderColor: '#D97706',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Horizontal bar to simulate distance
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: '벽과의 거리 (미터)' },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: commonTooltipOptions
+                }
+            }
+        });
+
+        // 4. Plotly Treemap: Maintenance Areas
+        // Using Plotly for hierarchical data visualization
+        const treemapData = [{
+            type: "treemap",
+            labels: ["유지보수", "낙상 예방", "야외 작업", "화학 물질", "화재 예방", "지붕 수리", "조경 관리", "세제 관리", "소화기 점검"],
+            parents: ["", "유지보수", "유지보수", "유지보수", "유지보수", "낙상 예방", "야외 작업", "화학 물질", "화재 예방"],
+            values:  [100, 30, 25, 20, 25, 15, 15, 10, 15], // Illustrative relative importance
+            textinfo: "label+value",
+            marker: {
+                colors: ["#E5E7EB", "#3B82F6", "#10B981", "#8B5CF6", "#EF4444", "#60A5FA", "#34D399", "#A78BFA", "#F87171"]
+            },
+            branchvalues: "total"
+        }];
+
+        const treemapLayout = {
+            margin: {l: 0, r: 0, t: 0, b: 0},
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Noto Sans KR' }
+        };
+
+        Plotly.newPlot('maintenanceTreemap', treemapData, treemapLayout, {displayModeBar: false, responsive: true});
+
+
+        // 5. Chart.js Radar Chart: Quiz Categories
+        const ctxRadar = document.getElementById('quizRadarChart').getContext('2d');
+        const rawQuizLabels = ['PPE 착용법', '전기 작업 안전', '사다리 사용법', '화학 물질 취급', '응급 상황 대처'];
+
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: wrapLabels(rawQuizLabels, 16),
+                datasets: [{
+                    label: '목표 이해도',
+                    data: [100, 100, 100, 100, 100],
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(59, 130, 246)'
+                }, {
+                    label: '현재 평균 점수',
+                    data: [85, 70, 90, 75, 80], // Illustrative data
+                    fill: true,
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    borderColor: 'rgb(245, 158, 11)',
+                    pointBackgroundColor: 'rgb(245, 158, 11)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(245, 158, 11)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: { borderWidth: 3 }
+                },
+                scales: {
+                    r: {
+                        angleLines: { display: false },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    tooltip: commonTooltipOptions
+                }
+            }
+        });
+
+    </script>
+    
+    <!-- 
+      Source Material Analysis & Plan:
+      1. Source: "Theocratic Safety Guide User Manual" covering volunteer safety, high-risk work, and AI tools.
+      2. Narrative: Start with the "Why" (Hierarchy of Controls), move to the "What" (App structure), detail "How" (Ladder rules), explain "Tools" (AI/Maintenance), and finish with "Check" (Quiz).
+      3. Visualizations:
+         - Hierarchy: Pyramid/Funnel chart (Plotly) -> Visualizes levels of control.
+         - App Structure: Doughnut chart (Chart.js) -> Shows menu composition.
+         - Ladder Rule: Bar chart (Chart.js) -> Compares Height vs Distance directly.
+         - Maintenance: Treemap (Plotly) -> Hierarchical breakdown of tasks.
+         - Quiz: Radar chart (Chart.js) -> Skills assessment visualization.
+      4. Constraints: No SVG tags, No Mermaid, Chart wrappers used, Tailwind styling applied.
+    -->
+</body>
+</html>
